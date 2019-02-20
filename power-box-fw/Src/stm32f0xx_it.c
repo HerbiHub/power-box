@@ -77,8 +77,10 @@ extern DMA_HandleTypeDef hdma_usart2_rx;
 extern UART_HandleTypeDef huart1;
 extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
-extern uint8_t dma_rx_buffer[dma_rx_buffer_SIZE];
 extern RTC_HandleTypeDef hrtc;
+extern uint8_t huart1_dma_rx_buffer[huart1_dma_rx_buffer_SIZE];
+extern uint8_t huart1_dma_rx_buffer_index;
+extern bool huart1_dma_rx_buffer_command;
 
 /* USER CODE END EV */
 
@@ -194,14 +196,16 @@ void DMA1_Channel4_5_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
-  RTC_TimeTypeDef sTime;
-  RTC_DateTypeDef sDate;
+  // RTC_TimeTypeDef sTime;
+  // RTC_DateTypeDef sDate;
 
-  HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
-  HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
+  // HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+  // HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 
-  printf("The time is: %02d:%02d:%02d\n", sTime.Hours, sTime.Minutes, sTime.Seconds);
-  printf("%i %i\n",dma_rx_buffer_SIZE - huart1.hdmarx->Instance->CNDTR, dma_rx_buffer[dma_rx_buffer_SIZE - huart1.hdmarx->Instance->CNDTR-1]);
+
+  // printf("The time is: %02d:%02d:%02d\n", sTime.Hours, sTime.Minutes, sTime.Seconds);
+  if (huart1_dma_rx_buffer[huart1_dma_rx_buffer_SIZE - huart1.hdmarx->Instance->CNDTR-1] == '\n') huart1_dma_rx_buffer_command = true;
+  // printf("%i\n",huart1_dma_rx_buffer_SIZE - huart1.hdmarx->Instance->CNDTR );
   /* USER CODE END USART1_IRQn 0 */
   HAL_UART_IRQHandler(&huart1);
   /* USER CODE BEGIN USART1_IRQn 1 */

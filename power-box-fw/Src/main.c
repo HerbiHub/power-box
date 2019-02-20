@@ -70,7 +70,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t dma_rx_buffer[dma_rx_buffer_SIZE];
+uint8_t huart1_dma_rx_buffer[huart1_dma_rx_buffer_SIZE];
+uint8_t huart1_dma_rx_buffer_index; 
+bool huart1_dma_rx_buffer_command;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -100,7 +102,8 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  huart1_dma_rx_buffer_index = 0;
+  huart1_dma_rx_buffer_command = false;
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -121,7 +124,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
-  HAL_UART_Receive_DMA(&huart1, dma_rx_buffer, dma_rx_buffer_SIZE);
+  HAL_UART_Receive_DMA(&huart1, huart1_dma_rx_buffer, huart1_dma_rx_buffer_SIZE);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -129,7 +132,20 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+    if (huart1_dma_rx_buffer_command)
+    {
+      huart1_dma_rx_buffer_command = false;
+      // printf("CMD!\n");
+      do 
+      {
+        printf("%d:%c (%d)\n", 
+          huart1_dma_rx_buffer[huart1_dma_rx_buffer_index],
+          huart1_dma_rx_buffer[huart1_dma_rx_buffer_index],
+          huart1_dma_rx_buffer_index);
+          // huart1_dma_rx_buffer_index++;
+      } while (huart1_dma_rx_buffer[huart1_dma_rx_buffer_index++] != '\n');
+      printf("FIN\n\n");
+    }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -203,7 +219,8 @@ void HAL_UART_RxHalfCpltCallback (UART_HandleTypeDef *huart){
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart){
   // Just restart that UART for me, okay?
   __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
-  HAL_UART_Receive_DMA(&huart1, dma_rx_buffer, dma_rx_buffer_SIZE);
+  HAL_UART_Receive_DMA(&huart1, huart1_dma_rx_buffer, huart1_dma_rx_buffer_SIZE);
+  huart1_dma_rx_buffer_index = 0;
 }
 /* USER CODE END 4 */
 

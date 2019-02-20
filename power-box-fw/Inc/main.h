@@ -52,6 +52,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdbool.h>
 
 /* USER CODE END Includes */
 
@@ -80,7 +81,7 @@ void Error_Handler(void);
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
-#define dma_rx_buffer_SIZE 200
+#define huart1_dma_rx_buffer_SIZE 200
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
