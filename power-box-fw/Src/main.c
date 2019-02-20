@@ -49,6 +49,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "printf.h"
+#include "command_processor.h"
 
 /* USER CODE END Includes */
 
@@ -72,7 +73,7 @@
 /* USER CODE BEGIN PV */
 uint8_t huart1_dma_rx_buffer[huart1_dma_rx_buffer_SIZE];
 uint8_t huart1_dma_rx_buffer_index; 
-bool huart1_dma_rx_buffer_command;
+volatile bool huart1_dma_rx_buffer_command;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -132,21 +133,18 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    if (huart1_dma_rx_buffer_command)
+    /* USER CODE BEGIN 3 */
+    if (huart1_dma_rx_buffer_command == true)
     {
       huart1_dma_rx_buffer_command = false;
-      // printf("CMD!\n");
-      do 
-      {
-        printf("%d:%c (%d)\n", 
-          huart1_dma_rx_buffer[huart1_dma_rx_buffer_index],
-          huart1_dma_rx_buffer[huart1_dma_rx_buffer_index],
-          huart1_dma_rx_buffer_index);
-          // huart1_dma_rx_buffer_index++;
-      } while (huart1_dma_rx_buffer[huart1_dma_rx_buffer_index++] != '\n');
-      printf("FIN\n\n");
+      HAL_Delay(1);
+      // NULL terminate the string.
+      // Call command processor
+      // printf("'%s'\n",huart1_dma_rx_buffer);
+      CMD_PROC_Process_Main(huart1_dma_rx_buffer);
+      __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
+      HAL_UART_Receive_DMA(&huart1, huart1_dma_rx_buffer, huart1_dma_rx_buffer_SIZE);
     }
-    /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
 }
@@ -208,6 +206,9 @@ void _putchar(char character){
   Included for compeleteness. Not used. 
   */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
+  HAL_UART_Abort(&huart1);
+  __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
+  HAL_UART_Receive_DMA(&huart1, huart1_dma_rx_buffer, huart1_dma_rx_buffer_SIZE);
 }
 
 /**
@@ -218,9 +219,9 @@ void HAL_UART_RxHalfCpltCallback (UART_HandleTypeDef *huart){
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart){
   // Just restart that UART for me, okay?
+  HAL_UART_Abort(&huart1);
   __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
   HAL_UART_Receive_DMA(&huart1, huart1_dma_rx_buffer, huart1_dma_rx_buffer_SIZE);
-  huart1_dma_rx_buffer_index = 0;
 }
 /* USER CODE END 4 */
 
