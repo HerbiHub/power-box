@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpointer-sign"
 CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(uint8_t* buffer)
 {
   uint8_t version;
@@ -14,11 +12,22 @@ CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(uint8_t* buffer)
   uint8_t transmitter[4];
   uint8_t command[20];
 
-  uint8_t *tok;
+  char *tok;
+  char *pch;
   int count=0;
 
   // TODO: We must calculate our CRC before touching the string, as we will
   //  be adding \0 characters to it. 
+  pch = strrchr((char *)buffer, ',');
+  printf("CRC: ");
+  do
+  {
+    printf("%c",buffer[count]);
+  } while (&buffer[count++] != pch);
+  printf("\n");
+
+  // Reset count 
+  count = 0;
 
   printf("Parse: '%s'\n", buffer);
   tok = strtok((char *)buffer, ",");
@@ -30,4 +39,3 @@ CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(uint8_t* buffer)
 
   return CMD_PROC_OK;
 }
-#pragma GCC diagnostic pop
