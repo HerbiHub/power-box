@@ -15,7 +15,9 @@ typedef enum
 
 #define CMD_PROC_SUBCOMMAND_GET "GET"
 
-CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(uint8_t* buffer);
+CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(char* buffer);
+
+CMD_PROC_StatusTypeDef CMD_PROC_CMD_Baud(char version, char* verb);
 
 
 #endif /* __command_processor_H */

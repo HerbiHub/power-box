@@ -140,11 +140,11 @@ int main(void)
     if (huart1_dma_rx_buffer_command == true)
     {
       huart1_dma_rx_buffer_command = false;
-      HAL_Delay(1);
+      // HAL_Delay(1);
       // NULL terminate the string.
       // Call command processor
       // printf("'%s'\n",huart1_dma_rx_buffer);
-      CMD_PROC_Process_Main(huart1_dma_rx_buffer);
+      CMD_PROC_Process_Main((char *)huart1_dma_rx_buffer);
       __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
       HAL_UART_Receive_DMA(&huart1, huart1_dma_rx_buffer, huart1_dma_rx_buffer_SIZE);
     }

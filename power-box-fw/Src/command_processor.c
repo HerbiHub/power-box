@@ -6,7 +6,7 @@
 #include <string.h>
 #include "crc.h"
 
-CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(uint8_t* buffer)
+CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(char* buffer)
 {
   uint8_t version;
   char target[20];
@@ -21,7 +21,7 @@ CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(uint8_t* buffer)
 
   // Locate the last ',' of the command.
   pch = strrchr((char *)buffer, ',');
-  count = ((uint8_t *)pch - buffer) + 1;
+  count = (pch - buffer) + 1;
   if (count < 200)
   {
     // So as it turns out, CRC on the STM32 is stupid. Calculate it byte by byte like a sane
@@ -39,7 +39,7 @@ CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(uint8_t* buffer)
     __HAL_UNLOCK(&hcrc);
 
     // temp = HAL_CRC_Calculate(&hcrc, (uint32_t *) buffer, count);
-    printf("Crc: %X\n",cmd_crc); 
+    printf("Crc: %X\n",cmd_crc);
   }
 
 
@@ -89,6 +89,11 @@ CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(uint8_t* buffer)
     return CMD_PROC_ERROR;
   }
 
+  return CMD_PROC_OK;
+}
 
+
+CMD_PROC_StatusTypeDef CMD_PROC_CMD_Baud(char version, char* verb)
+{
   return CMD_PROC_OK;
 }
