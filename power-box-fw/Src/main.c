@@ -40,6 +40,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "crc.h"
 #include "dma.h"
 #include "i2c.h"
 #include "rtc.h"
@@ -122,6 +123,7 @@ int main(void)
   MX_I2C2_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
+  MX_CRC_Init();
   /* USER CODE BEGIN 2 */
 
   __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
@@ -133,6 +135,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
     if (huart1_dma_rx_buffer_command == true)
     {
