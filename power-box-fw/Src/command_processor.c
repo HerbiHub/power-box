@@ -16,16 +16,16 @@ CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(char* buffer)
 
   char *tok;
   char *pch;
-  uint32_t count=0;
   uint32_t index;
 
   // Locate the last ',' of the command.
   pch = strrchr((char *)buffer, ',');
-  count = (pch - buffer) + 1;
-  if (count < 200)
+  if ((pch - buffer) + 1 < 200)
   {
     // So as it turns out, CRC on the STM32 is stupid. Calculate it byte by byte like a sane
     //  person and use that value. 
+
+    // temp = HAL_CRC_Calculate(&hcrc, (uint32_t *) buffer, count);
     __HAL_LOCK(&hcrc); 
     __HAL_CRC_INITIALCRCVALUE_CONFIG(&hcrc,0xFFFFFFFF); // Set to zero to match python poly config
     hcrc.State = HAL_CRC_STATE_BUSY;
@@ -38,22 +38,9 @@ CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(char* buffer)
     hcrc.State = HAL_CRC_STATE_READY; 
     __HAL_UNLOCK(&hcrc);
 
-    // temp = HAL_CRC_Calculate(&hcrc, (uint32_t *) buffer, count);
     printf("Crc: %X\n",cmd_crc);
   }
 
-
-
-  // Reset count 
-  // count = 0;
-
-  // printf("Parse: '%s'\n", buffer);
-  // tok = strtok((char *)buffer, ",");
-  // do
-  // {
-  //   printf("%d:%s\n", count++, tok );
-  // } while ((tok = strtok(NULL, ",")) != NULL);
-  // printf("\n");
 
   // Get version
   tok = strtok((char *)buffer, ",");
