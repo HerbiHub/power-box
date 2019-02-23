@@ -150,7 +150,7 @@ void SysTick_Handler(void)
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
-
+  myTick++;
   /* USER CODE END SysTick_IRQn 1 */
 }
 
@@ -226,5 +226,9 @@ void USART2_IRQHandler(void)
 
 /* USER CODE BEGIN 1 */
 
+long long GetMyTick(void)
+{
+  return myTick;
+}
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

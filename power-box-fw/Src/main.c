@@ -75,6 +75,7 @@
 uint8_t huart1_dma_rx_buffer[huart1_dma_rx_buffer_SIZE];
 uint8_t huart1_dma_rx_buffer_index; 
 volatile bool huart1_dma_rx_buffer_command;
+volatile uint64_t myTick;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -106,6 +107,7 @@ int main(void)
   /* USER CODE BEGIN Init */
   huart1_dma_rx_buffer_index = 0;
   huart1_dma_rx_buffer_command = false;
+  myTick = 0;
   /* USER CODE END Init */
 
   /* Configure the system clock */

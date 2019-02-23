@@ -82,6 +82,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
 #define huart1_dma_rx_buffer_SIZE 200
+
+extern volatile uint64_t myTick;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

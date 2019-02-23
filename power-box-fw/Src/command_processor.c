@@ -1,10 +1,11 @@
 
 #include "command_processor.h"
 
+#include "crc.h"
 #include "printf.h"
+#include "stm32f0xx_it.h"
 #include <stdlib.h>
 #include <string.h>
-#include "crc.h"
 
 CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(char* buffer)
 {
@@ -16,11 +17,13 @@ CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(char* buffer)
 
   char *tok;
   char *pch;
-  uint32_t index;
+  int index;
+  int count;
 
   // Locate the last ',' of the command.
   pch = strrchr((char *)buffer, ',');
-  if ((pch - buffer) + 1 < 200)
+  count = (pch - buffer) + 1;
+  if (count < 200)
   {
     // So as it turns out, CRC on the STM32 is stupid. Calculate it byte by byte like a sane
     //  person and use that value. 
@@ -75,6 +78,7 @@ CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(char* buffer)
     printf("Unknown command %s\n", command);
     return CMD_PROC_ERROR;
   }
+  printf("%lld\n",GetMyTick()/1000);
 
   return CMD_PROC_OK;
 }
@@ -82,5 +86,11 @@ CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(char* buffer)
 
 CMD_PROC_StatusTypeDef CMD_PROC_CMD_Baud(char version, char* verb)
 {
+  char *tok;
+
+  while ((tok = strtok(NULL, ",")) != NULL)
+  {
+    printf("%s\n",tok);
+  }
   return CMD_PROC_OK;
 }

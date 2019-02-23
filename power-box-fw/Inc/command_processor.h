@@ -11,6 +11,16 @@ typedef enum
   CMD_PROC_ERROR    = 0x01U
 } CMD_PROC_StatusTypeDef;
 
+typedef struct 
+{
+	unsigned int version;
+  char target[20];
+  char transmitter[20];
+  char command[20];
+  unsigned int cmd_crc;
+
+} CMD_PROC_CommandStruct;
+
 #define CMD_PROC_COMMAND_RTC "RTC"
 
 #define CMD_PROC_SUBCOMMAND_GET "GET"
