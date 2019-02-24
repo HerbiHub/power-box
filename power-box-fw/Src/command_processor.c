@@ -14,7 +14,7 @@ CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(char* buffer)
 
   char *tok;
   char *pch;
-  char response[150];
+  char response[150]; // How big is our biggest response?
   int count;
 
   // Locate the last ',' of the command.
@@ -65,7 +65,7 @@ CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(char* buffer)
     printf("Unknown command %s\n", recp_command.command);
     return CMD_PROC_ERROR;
   }
-  printf("%lld\n",GetMyTick()/1000);
+  // printf("%lld\n",GetMyTick()/1000);
 
   return CMD_PROC_OK;
 }
@@ -88,6 +88,7 @@ CMD_PROC_StatusTypeDef CMD_PROC_CMD_RTC(CMD_PROC_CommandStruct* recp_command, ch
   char *tok;
   RTC_TimeTypeDef time;
   RTC_DateTypeDef date;
+  CMD_PROC_CommandStruct response_struct = {0};
   printf("Process RTC Command\n");
 
   if (strcmp(recp_command->verb,"GET") == 0)
@@ -96,7 +97,22 @@ CMD_PROC_StatusTypeDef CMD_PROC_CMD_RTC(CMD_PROC_CommandStruct* recp_command, ch
     HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
     HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
 
-    printf("20%02d-%02d-%02d %02d:%02d:%02d\n", date.Year, date.Month, date.Date, time.Hours, time.Minutes, time.Seconds);
+    response_struct.version = 1;
+    strcpy(response_struct.target, "HOST");
+    strcpy(response_struct.transmitter, "SLAV");
+    strcpy(response_struct.command, "RTC");
+    strcpy(response_struct.verb, "SAY");
+    response_struct.option1 = date.Year;
+    response_struct.option2 = date.Month;
+    response_struct.option3 = date.Date;
+    response_struct.option4 = time.Hours;
+    response_struct.option5 = time.Minutes;
+    response_struct.option6 = time.Seconds;
+
+
+    ResponseStringGenerator(response, &response_struct, 6);
+
+    printf("%s\n",response);
 
   } else if (strcmp(recp_command->verb,"SET") == 0)
   {
@@ -156,4 +172,51 @@ uint32_t CalcCRC32(char* buffer, int length)
   hcrc.State = HAL_CRC_STATE_READY; 
   __HAL_UNLOCK(&hcrc);
   return hcrc.Instance->DR;
+}
+
+void ResponseStringGenerator(char* response_buffer, CMD_PROC_CommandStruct* command_struct, int options)
+{
+  char *null_location = response_buffer;
+
+  null_location += snprintf(response_buffer, 150, "%d,%s,%s,%s,%s,", 
+   command_struct->version,
+   command_struct->target,
+   command_struct->transmitter,
+   command_struct->command,
+   command_struct->verb);
+
+  if (options>0)
+  {
+    // Find end of 
+    null_location += snprintf(null_location, 150, "%d,", command_struct->option1);
+  }
+  if (options>1)
+  {
+    // Find end of 
+    null_location += snprintf(null_location, 150, "%d,", command_struct->option2);
+  }
+  if (options>2)
+  {
+    // Find end of 
+    null_location += snprintf(null_location, 150, "%d,", command_struct->option3);
+  }
+  if (options>3)
+  {
+    // Find end of 
+    null_location += snprintf(null_location, 150, "%d,", command_struct->option4);
+  }
+  if (options>4)
+  {
+    // Find end of 
+    null_location += snprintf(null_location, 150, "%d,", command_struct->option5);
+  }
+  if (options>5)
+  {
+    // Find end of 
+    null_location += snprintf(null_location, 150, "%d,", command_struct->option6);
+  }
+
+  null_location += snprintf(null_location, 150, "0x%X", CalcCRC32(response_buffer, strlen(response_buffer)));
+
+
 }
