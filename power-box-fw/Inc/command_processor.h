@@ -14,9 +14,19 @@ typedef enum
 typedef struct 
 {
 	unsigned int version;
+  
   char target[20];
+
   char transmitter[20];
+
   char command[20];
+
+  char verb[10];        // Cap to 5 characters (size 6 for null)?
+
+  unsigned int option1;
+
+  unsigned int option2;
+
   unsigned int cmd_crc;
 
 } CMD_PROC_CommandStruct;
@@ -27,7 +37,9 @@ typedef struct
 
 CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(char* buffer);
 
-CMD_PROC_StatusTypeDef CMD_PROC_CMD_Baud(char version, char* verb);
-
+CMD_PROC_StatusTypeDef CMD_PROC_CMD_Baud(CMD_PROC_CommandStruct* recp_command, char* response);
+CMD_PROC_StatusTypeDef CMD_PROC_CMD_RTC(CMD_PROC_CommandStruct* recp_command, char* response);
+CMD_PROC_StatusTypeDef CMD_PROC_CMD_Status(CMD_PROC_CommandStruct* recp_command, char* response);
+uint32_t CalcCRC32(char* buffer, int length);
 
 #endif /* __command_processor_H */

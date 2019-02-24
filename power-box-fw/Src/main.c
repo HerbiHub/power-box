@@ -75,7 +75,7 @@
 uint8_t huart1_dma_rx_buffer[huart1_dma_rx_buffer_SIZE];
 uint8_t huart1_dma_rx_buffer_index; 
 volatile bool huart1_dma_rx_buffer_command;
-volatile uint64_t myTick;
+volatile uint64_t myTick; //Does not enjoy being called a 'long long'. 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -115,18 +115,28 @@ int main(void)
 
   /* USER CODE BEGIN SysInit */
 
+
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_RTC_Init();
   MX_I2C1_Init();
   MX_I2C2_Init();
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   MX_CRC_Init();
+  MX_RTC_Init();
   /* USER CODE BEGIN 2 */
+
+  HAL_RTCEx_SetSmoothCalib(&hrtc, RTC_SMOOTHCALIB_PERIOD_8SEC, RTC_SMOOTHCALIB_PLUSPULSES_SET, 0x0);
+
+  /*
+    SET     0x0 
+    SET   0x1ff 
+    RESET   0x0
+    RESET 0x1ff 
+   */
 
   __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
   HAL_UART_Receive_DMA(&huart1, huart1_dma_rx_buffer, huart1_dma_rx_buffer_SIZE);
