@@ -51,15 +51,15 @@ CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(char* buffer)
   // TODO: Not sure of the formatting of these else-ifs. Maybe make them prettier?
   if (strcmp(recp_command.command,"BAUD") == 0)
   {
-    if (CMD_PROC_CMD_Baud(&recp_command) == CMD_PROC_ERROR)
+    if (CMD_PROC_CMD_Baud(&recp_command, response) == CMD_PROC_ERROR)
       printf("ERROR\n");
   } else if (strcmp(recp_command.command,"RTC") == 0) 
   {
-    if (CMD_PROC_CMD_RTC(&recp_command) == CMD_PROC_ERROR)
+    if (CMD_PROC_CMD_RTC(&recp_command, response) == CMD_PROC_ERROR)
       printf("ERROR\n");
   } else if (strcmp(recp_command.command,"STATUS") == 0)
   {
-    if (CMD_PROC_CMD_Status(&recp_command) == CMD_PROC_ERROR)
+    if (CMD_PROC_CMD_Status(&recp_command, response) == CMD_PROC_ERROR)
       printf("ERROR\n");
   } else {
     printf("Unknown command %s\n", recp_command.command);
@@ -70,8 +70,7 @@ CMD_PROC_StatusTypeDef CMD_PROC_Process_Main(char* buffer)
   return CMD_PROC_OK;
 }
 
-
-CMD_PROC_StatusTypeDef CMD_PROC_CMD_Baud(CMD_PROC_CommandStruct* recp_command)
+CMD_PROC_StatusTypeDef CMD_PROC_CMD_Baud(CMD_PROC_CommandStruct* recp_command, char* response)
 {
   char *tok;
 
@@ -84,7 +83,7 @@ CMD_PROC_StatusTypeDef CMD_PROC_CMD_Baud(CMD_PROC_CommandStruct* recp_command)
   return CMD_PROC_OK;
 }
 
-CMD_PROC_StatusTypeDef CMD_PROC_CMD_RTC(CMD_PROC_CommandStruct* recp_command)
+CMD_PROC_StatusTypeDef CMD_PROC_CMD_RTC(CMD_PROC_CommandStruct* recp_command, char* response)
 {
   char *tok;
   RTC_TimeTypeDef time;
@@ -131,7 +130,7 @@ CMD_PROC_StatusTypeDef CMD_PROC_CMD_RTC(CMD_PROC_CommandStruct* recp_command)
   return CMD_PROC_OK;
 }
 
-CMD_PROC_StatusTypeDef CMD_PROC_CMD_Status(CMD_PROC_CommandStruct* recp_command)
+CMD_PROC_StatusTypeDef CMD_PROC_CMD_Status(CMD_PROC_CommandStruct* recp_command, char* response)
 {
   char *tok;
   printf("Process STATUS Command\n");
