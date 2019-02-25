@@ -47,6 +47,7 @@ Src/gpio.c \
 Src/i2c.c \
 Src/printf.c \
 Src/rtc.c \
+Src/sensors.c \
 Src/stm32f0xx_hal_msp.c \
 Src/stm32f0xx_it.c \
 Src/system_stm32f0xx.c \

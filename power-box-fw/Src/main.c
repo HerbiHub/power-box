@@ -140,6 +140,20 @@ int main(void)
 
   __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
   HAL_UART_Receive_DMA(&huart1, huart1_dma_rx_buffer, huart1_dma_rx_buffer_SIZE);
+
+  // printf("Checking I2C address space...\n");
+  // for (int i = 2; i < 128; i++)
+  // {
+  //   if (HAL_I2C_IsDeviceReady(&hi2c1, (uint16_t)i<<1, 1, 10 ) == HAL_OK) printf("0x%X\n", i);
+  // }
+  // printf("I2C Scan Completed\n");
+
+
+
+  // HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+  // ret = HAL_I2C_Mem_Read(&hi2c1, 0x40, 0x02, 2, (uint8_t*)data_buffer, 2, 100);
+  // printf("Ret: %x\nData Buffer: %2x %2x", ret, data_buffer[0], data_buffer[1]);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
