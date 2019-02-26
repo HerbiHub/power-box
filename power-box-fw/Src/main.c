@@ -44,6 +44,7 @@
 #include "dma.h"
 #include "i2c.h"
 #include "rtc.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -51,6 +52,7 @@
 /* USER CODE BEGIN Includes */
 #include "printf.h"
 #include "command_processor.h"
+#include "sensors/sensors.h"
 
 /* USER CODE END Includes */
 
@@ -127,6 +129,8 @@ int main(void)
   MX_USART2_UART_Init();
   MX_CRC_Init();
   MX_RTC_Init();
+  MX_TIM1_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
   HAL_RTCEx_SetSmoothCalib(&hrtc, RTC_SMOOTHCALIB_PERIOD_8SEC, RTC_SMOOTHCALIB_PLUSPULSES_SET, 0x0);
@@ -140,15 +144,18 @@ int main(void)
 
   __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
   HAL_UART_Receive_DMA(&huart1, huart1_dma_rx_buffer, huart1_dma_rx_buffer_SIZE);
-
-  // printf("Checking I2C address space...\n");
-  // for (int i = 2; i < 128; i++)
-  // {
-  //   if (HAL_I2C_IsDeviceReady(&hi2c1, (uint16_t)i<<1, 1, 10 ) == HAL_OK) printf("0x%X\n", i);
-  // }
-  // printf("I2C Scan Completed\n");
+  HAL_Delay(100);
 
 
+  HAL_TIM_Base_Start_IT(&htim1);
+  HAL_TIM_Base_Start_IT(&htim3);
+
+  printf("Checking I2C address space...\n");
+  for (int i = 2; i < 128; i++)
+  {
+    if (HAL_I2C_IsDeviceReady(&hi2c1, (uint16_t)i<<1, 1, 10 ) == HAL_OK) printf("0x%X\n", i);
+  }
+  printf("I2C Scan Completed\n");
 
   // HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout)
   // ret = HAL_I2C_Mem_Read(&hi2c1, 0x40, 0x02, 2, (uint8_t*)data_buffer, 2, 100);
@@ -174,6 +181,9 @@ int main(void)
       __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
       HAL_UART_Receive_DMA(&huart1, huart1_dma_rx_buffer, huart1_dma_rx_buffer_SIZE);
     }
+    // sensor_main();
+    printf("%d\n",TIM3->CNT);
+    HAL_Delay(2000);
   }
   /* USER CODE END 3 */
 }
@@ -194,7 +204,10 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.LSIState = RCC_LSI_ON;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL12;
+  RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -203,11 +216,11 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
   {
     Error_Handler();
   }
@@ -252,6 +265,60 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart){
   __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
   HAL_UART_Receive_DMA(&huart1, huart1_dma_rx_buffer, huart1_dma_rx_buffer_SIZE);
 }
+
+// #pragma GCC push_options
+// #pragma GCC optimize ("O0")
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  if (htim->Instance == TIM1)
+  {
+    if (TIM3->CNT < 1)
+    {
+      HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_SET);
+    } else {
+      HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_RESET);
+    }
+
+    if (TIM3->CNT < 25)
+    {
+      HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_SET);
+    } else {
+      HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_RESET);
+    }
+
+    if (TIM3->CNT < 50)
+    {
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+    } else {
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+    }
+
+    if (TIM3->CNT < 75)
+    {
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+    } else {
+      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+    }
+
+    // htim->Init.Period = 1000;
+    // htim->Instance->ARR += 1;
+    // htim->Instance->CNT = 0; // In practice we can use this to advance or delay our count.
+    // htim->Instance->CNT = -50;
+    // MX_TIM1_Init();
+  } else if (htim->Instance == TIM3) {
+    TIM1->CNT=0;
+    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+  }
+}
+// #pragma GCC pop_options
+// void HAL_TIM_TriggerCallback(TIM_HandleTypeDef *htim)
+// {
+//   HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_4);
+//   // htim->Init.Period = 10000;
+// }
 /* USER CODE END 4 */
 
 /**
