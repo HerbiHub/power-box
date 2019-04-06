@@ -172,6 +172,8 @@ int main(void)
     /* USER CODE BEGIN 3 */
     if (huart1_dma_rx_buffer_command == true)
     {
+
+      HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_SET);
       huart1_dma_rx_buffer_command = false;
       // HAL_Delay(1);
       // NULL terminate the string.
@@ -180,10 +182,11 @@ int main(void)
       CMD_PROC_Process_Main((char *)huart1_dma_rx_buffer);
       __HAL_UART_ENABLE_IT(&huart1, UART_IT_RXNE);
       HAL_UART_Receive_DMA(&huart1, huart1_dma_rx_buffer, huart1_dma_rx_buffer_SIZE);
+      HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_RESET);
     }
     // sensor_main();
-    printf("%d\n",TIM3->CNT);
-    HAL_Delay(2000);
+    // printf("%d\n",TIM3->CNT);
+    // HAL_Delay(2000);
   }
   /* USER CODE END 3 */
 }
@@ -274,9 +277,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   {
     if (TIM3->CNT < 1)
     {
-      HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_SET);
+      // HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_SET);
     } else {
-      HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_RESET);
+      // HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_RESET);
     }
 
     if (TIM3->CNT < 25)
@@ -307,11 +310,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     // MX_TIM1_Init();
   } else if (htim->Instance == TIM3) {
     TIM1->CNT=0;
-    HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_SET);
+    // HAL_GPIO_WritePin(GPIOF, GPIO_PIN_4, GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOF, GPIO_PIN_5, GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
   }
+
 }
 // #pragma GCC pop_options
 // void HAL_TIM_TriggerCallback(TIM_HandleTypeDef *htim)
