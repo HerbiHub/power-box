@@ -94,8 +94,8 @@ CMD_PROC_StatusTypeDef CMD_PROC_CMD_RTC(CMD_PROC_CommandStruct* recp_command, ch
   if (strcmp(recp_command->verb,"GET") == 0)
   {
     // TODO: Respond with our own current RTC
-    HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
     HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
+    HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
 
     response_struct.version = 1;
     strcpy(response_struct.target, "HOST");
